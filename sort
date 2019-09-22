@@ -1,0 +1,147 @@
+//冒泡排序  （前面为无序，后面为有序， 相当于在前面无序中两两比较选择最大的一个冒泡到 数组尾巴上来。）
+//稳定排序（元素间相对位置不会发生改变） 时间复杂度O（n^2） 最好情况为正序 O（n）
+function Bubblesort(arr) {
+    //i首先等于最大长度 表示前面无序区（最大长度 全为无序），执行一次 就添加了一个有序的往后
+    for (let i = arr.length; i > 0; i--) {
+        //遍历前面的无序区
+        for (let j = 0; j < i; j++) {
+            //如果左边的比右边的大则交互位置 这样i还没有执行--的时候 的i 那个位置 出现的就是无序区最大的值
+            if (arr[j] > arr[j + 1]) {
+                var temp = arr[j + 1];
+                arr[j + 1] = arr[j];
+                arr[j] = temp;
+
+                //以上也可以使用解构赋值
+                //[arr[j + 1], arr[j]] = [arr[j], arr[j + 1]];
+            }
+        }
+    }
+    return arr;
+}
+//console.log(Bubblesort([5,0,4,18,6,3,2,1]));
+
+
+// 直接插入排序        (前面为有序，后面为无序。从第一个无序的元素开始与前面有序元素从最后一个开始进行对比，
+//如果比他大，则进行下一个。直到找到一个比他小的，就放在他后面) 
+//最好为正序时间复杂度为O（n） 最坏为反序O（n^2） 
+//稳定排序
+function insertsort(arr) {
+    //首先以第一个元素为有序队列
+    for (let i = 1; i <= arr.length; i++) {
+        //第二个让他等个待定值  也就是i 为将要插入元素 
+        temp = arr[i];
+        //循环前面的有序队列   让待插入元素与有序最后一个比较如果比最后一个元素小，则替换位置，
+        //一直重复
+        for (j = i - 1; temp < arr[j]; j--) {
+            arr[j + 1] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    return arr;
+}
+
+
+
+//希尔排序    （直接插入排序优化版， 首先设置间隔数，间隔数逐渐减少直到1，让存在相同间隔的元素进行直接插入排序。
+//直到间隔为1时，就是普通的直接插入排序。这时候该数组基本已经为有序数组了）。
+//当间数组长度在某个特定范围时  ，时间复杂度为O（n^1.3）
+//不稳定的排序
+function shellsort(arr) {
+    //设置间隔多少个数 进行比较，然后依次往下除，直到最后d=1
+    for (let d = parseInt(arr.length / 2); d >= 1; d = parseInt(d / 2)) {
+        //console.log(arr);
+        //让 i 等于 第 d个元素，然后 j为第i-d个元素（间隔为d）， 依次比较 满足 前面比后面大  则交换位置
+        for (var i = d; i < arr.length; i++) {
+            // 先让一个第i个元素为哨兵，
+            let temp = arr[i];
+            //当 j>=0 的时候，满足前面比后面大，则交换位置。
+            //当 d=1时 就是最普通的直接插入排序
+            for (var j = i - d; j >= 0 && arr[j] > temp; j = j - d) {
+                //arr[j+d] = arr[j];
+                // arr[j] = temp;
+                //使用ES6解构赋值
+                [arr[j + d], arr[j]] = [arr[j], temp];
+            }
+        }
+    }
+    return arr
+}
+
+
+//选择排序   （分为前面有序，后面无序。在后面无序中选择最小的 放到最前面来）
+//无论什么顺序，关键码的比较次数都相同，所以时间复杂度为O（n^2）
+//不稳定排序
+function selectsort(arr) {
+    //循环次数持续长度-1次，因为最后一个剩下的就是最大的 不用选
+    for (let i = 0; i < arr.length - 1; i++) {
+        //假定最小的 就是第一个
+        let min = i;
+        //循环后面的无序数组，i=0时 全是无序
+        for (let j = i + 1; j < arr.length; j++) {
+            //如果哪个比min 小，就让 min等于他
+            if (arr[j] < arr[min]) {
+                min = j;
+            }
+        }
+        //循环无序完成后，如果min 不等于i（表示后面有比i小的值） 交互位置
+        if (min != i) {
+            [arr[i], arr[min]] = [arr[min], arr[i]];
+        }
+    }
+    return arr
+}
+
+
+//堆排序   （首先将数组的值从上往下构建大顶堆（完全二叉树，每一个结点的子树比父节点小），这样最大的值一直都是在最上面。
+//然后让最顶上的值与数组最后一个元素交换位置（完全二叉树的最后一个子节点）。然后循环-1，并重复以上步骤，每次出来的都是前面最大值，
+//只需要初始化大顶堆arr.length-1 次即完成排序）
+//时间复杂度，初始构建堆需要 O（n）， 往后每一次构建堆都需要O（log<sub>2</sub>i）i为第几次，一共需要进行n-1次（n为数组长度，最后一次不需要进行）
+//所有总的时间复杂度为O（Nlog<sub>2</sub>N）
+//不稳定排序
+function heapsort(arr) {
+    //初始化大顶堆  使用Math.floor是为了取整，因为左右子树分别问 父节点*2+1 或父节点*2+2；所以 arr.length-1 次遍历即结束
+    for (let i = Math.floor(arr.length / 2 - 1); i >= 0; i--) {
+        shift(arr, i, arr.length);
+    }
+    //排序 每一次 的arr[0] 都是最大值，放在二叉树最后 ,i--
+    for (let i = arr.length - 1; i > 0; i--) {
+        [arr[0], arr[i]] = [arr[i], arr[0]];
+        //把交换进来的元素 在大顶堆中进行重新定位。
+        shift(arr, 0, i);
+    }
+
+
+    //构建大顶堆函数
+    function shift(arr, i, length) {
+        //根节点
+        let temp = arr[i];
+        //依次往下遍历 j=2*j+1
+        for (let j = 2 * i + 1; j < length; j = 2 * j + 1) {
+            //比较左右子树哪个更大，如果右子树大，j=右子树位置
+            if (j + 1 < length && arr[j] < arr[j + 1]) {
+                j++;
+            }
+            //比较根节点与子树大小，小则切换位置
+            if (temp < arr[j]) {
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+                //让 子节点为下一个根节点继续往下重复以上操作
+                i = j;
+            }
+        }
+    }
+    return arr
+}
+console.log(heapsort([5, 0, 4, 18, 6, 3, 2, 1]));
+
+
+//删除重复
+Array.prototype.DeleteRepate = function () {
+    let arr = new Set(this);
+    let arr1 = [];
+    for (let i of arr) {
+        arr1.push(i);
+    }
+    return arr1;
+}
+
+//console.log([1, 2, 3, 1, 2, 2, 4, 5].DeleteRepate());
